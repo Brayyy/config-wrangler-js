@@ -1,6 +1,6 @@
 {
   "name": "config-eec",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A standardized way to get configuration into your script using Etcd, environment vars and command line arguments",
   "main": "index.js",
   "directories": {
