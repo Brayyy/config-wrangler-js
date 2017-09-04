@@ -21,7 +21,8 @@ var configEec = require('config-eec');
 
 var configEecSetup = {
 	etcdNameSpace: 'cfg/web-service/',
-	envNameSpace: 'WEBSVC'
+	envNameSpace: 'WEBSVC',
+  requiredKeys: ['port', 'serverName', 'maxConnects']
 };
 
 // Config is returned in callback
@@ -67,6 +68,14 @@ node someScript.js --max-connects=50 --server-name="Test server"
 ```
 
 The configuration is now agnostic of the language of the script/service. The example above could have been PHP, Python or Node.js, being configured the same way.
+
+## Config object options
+| Key | Description |
+| - | - |
+| etcdNameSpace | Namespace/prefix to search for keys in Etcd |
+| envNameSpace | Namespace/prefix to search for keys in local environment |
+| etcdApiPath | Etcd V3 JSON proxy is currently at "/v3alpha". Option is here if it changes |
+| requiredKeys | List of camelCased keys which must exist, or script will exit |
 
 ## Notes
 - The Etcd server can be overridden by using the environment variable `ETCD_CONN`, defaulting to `http://localhost:2379`.

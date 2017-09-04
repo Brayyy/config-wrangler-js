@@ -200,6 +200,16 @@ exports.load = function (mConfigIn, loadCallback) {
 		queryEnv,
 		queryArgs
 	], function (err) {
+		// If requiredKeys is defined, verify they all exist
+		if (mConfig.requiredKeys) {
+			mConfig.requiredKeys.forEach(function (key) {
+				if (foundVars[key] === undefined) {
+					console.error('ConfigEEC: Missing required config key "' + key + '", exiting.');
+					process.exit();
+				}
+			}, this);
+		}
+		// Sort keys alphabetically
 		var orderedVars = {};
 		Object.keys(foundVars).sort().forEach(function (key) {
 			orderedVars[key] = foundVars[key];
