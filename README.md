@@ -17,16 +17,16 @@ Variables are overridden if they are redefined during that order. Meaning that i
 
 ## Example
 ```javascript
-var configEEC = require('config-eec');
+var configEec = require('config-eec');
 
-var configEECSetup = {
+var configEecSetup = {
 	etcdNameSpace: 'cfg/web-service/',
 	envNameSpace: 'WEBSVC'
 };
 
 // Config is returned in callback
 var config = {};
-configEEC.load(configEECSetup, function (err, configNew) {
+configEec.load(configEecSetup, function (err, configNew) {
   if (err) {
     console.error('Configuration load error.', err);
     process.exit();
@@ -38,7 +38,7 @@ configEEC.load(configEECSetup, function (err, configNew) {
 });
 
 // Watch for config changes
-configEEC.watch(function (err, configNew) {
+configEec.watch(function (err, configNew) {
   if (!err) {
     console.log('Configuration has been updated.');
     config = configNew;
