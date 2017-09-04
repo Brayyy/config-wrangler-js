@@ -52,7 +52,7 @@ configWrangler.watch(function (err, newConfig) {
 });
 ```
 
-Config is now available to project in three different formats:
+Config is now available to project from three different sources:
 
 | Etcd key | Env key | CLI key | Code result |
 | - | - | - | - |
