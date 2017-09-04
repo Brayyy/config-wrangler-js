@@ -1,6 +1,5 @@
 var http = require('http');
 var runSeries = require('run-series');
-// var debug = require('debug')('config-wrangler');
 
 var etcRetryDelay = 3000;
 var mConfig = {};
@@ -30,12 +29,10 @@ function etcdHttpInner (isWatch, postCallback) {
 
 	//  HTTP host+port to find etcd API
 	var etcdConn = process.env.ETCD_CONN || 'http://localhost:2379';
-	// debug(f + ' etcdConn:', etcdConn);
 
 	// HTTP path to post against. Watch differs from query.
 	var etcdPath = mConfig.etcdApiPath || 'v3alpha';
 	etcdPath = '/' + etcdPath + (isWatch ? '/watch' : '/kv/range');
-	// debug(f + ' etcdPath:', etcdPath);
 
 	// Post data includes the Etcd key range
 	var postData = {
@@ -44,7 +41,6 @@ function etcdHttpInner (isWatch, postCallback) {
 	};
 	if (isWatch) postData = { create_request: postData };
 	postData = JSON.stringify(postData);
-	// debug(f + ' postData:', postData);
 
 	// An object of options to indicate where to post to
 	var connParts = etcdConn.replace('http://', '').split(':');
@@ -58,8 +54,6 @@ function etcdHttpInner (isWatch, postCallback) {
 			'Content-Length': Buffer.byteLength(postData)
 		}
 	};
-	// debug(f + ' requestOptions:', requestOptions);
-
 	// console.log('  # curl http://' + connParts[0] + ':' + connParts[1] +
 	// 	etcdPath + ' -X POST -d \'' + postData + '\'');
 
@@ -71,13 +65,11 @@ function etcdHttpInner (isWatch, postCallback) {
 		res.setEncoding('utf8');
 		res.on('data', function (chunk) {
 			if (isWatch && chunk !== '') {
-				// debug(f + ' done (hit res.on(data)');
 				postCallback(null, chunk);
 			}
 			data += chunk;
 		});
 		res.on('end', function () {
-			// debug(f + ' done (hit res.on(end)');
 			postCallback(null, data);
 		});
 	});
@@ -96,7 +88,6 @@ function etcdHttpInner (isWatch, postCallback) {
 }
 
 function etcdHttp (isWatch, postCallback) {
-	// debug('etcdHttp()');
 	etcdHttpInner(isWatch, function (err, data) {
 		if (err) {
 			postCallback(err, data);
@@ -124,17 +115,13 @@ function etcdHttp (isWatch, postCallback) {
 }
 
 function queryEtcd (callback) {
-	// debug('queryEtcd()');
 	if (!mConfig.etcdNameSpace) {
-		// debug('queryEtcd() done (no-op)');
 		return callback(null);
 	}
 
 	etcdHttp(false, function (err, data) {
 		if (!err && data) {
-			// debug('queryEtcd() no error');
 			data.forEach(function (etcdItem) {
-				// debug('queryEtcd() etcdItem: ', etcdItem);
 				// Decode key/value
 				var key = b64Decode(etcdItem.key);
 				var value = b64Decode(etcdItem.value);
@@ -143,14 +130,12 @@ function queryEtcd (callback) {
 				foundVars[newKey] = value;
 			}, this);
 		}
-		// debug('queryEtcd() done');
 		callback(err);
 	});
 }
 
 function queryEnv (callback) {
 	if (!mConfig.envNameSpace) {
-		// debug('queryEnv() done (no-op)');
 		return callback(null);
 	}
 	var envPrefix = mConfig.envNameSpace + '_';
@@ -162,7 +147,6 @@ function queryEnv (callback) {
 			foundVars[newKey] = process.env[envKey];
 		}
 	});
-	// debug('queryEnv() done');
 	callback(null);
 }
 
@@ -179,7 +163,6 @@ function queryArgs (callback) {
 			}
 		}
 	});
-	// debug('queryArgs() done');
 	callback(null);
 }
 
@@ -188,7 +171,6 @@ function queryArgs (callback) {
  * @param {*} mConfigIn Config data object passed in
  */
 exports.config = function (mConfigIn) {
-	// debug('options() setting config');
 	mConfig = mConfigIn;
 };
 
@@ -197,7 +179,6 @@ exports.config = function (mConfigIn) {
  * @param {*} watchCallback Function to call after config is fetched from all sources
  */
 exports.load = function (loadCallback) {
-	// debug('load()');
 	foundVars = {};
 	runSeries([
 		queryEtcd,
@@ -218,7 +199,6 @@ exports.load = function (loadCallback) {
 		Object.keys(foundVars).sort().forEach(function (key) {
 			orderedVars[key] = foundVars[key];
 		});
-		// debug('load() complete');
 		loadCallback(err, orderedVars);
 	});
 };
@@ -228,18 +208,13 @@ exports.load = function (loadCallback) {
  * @param {*} watchCallback Function to call when anything in namespace is changed
  */
 exports.watch = function (watchCallback) {
-	// debug('watch()');
-	if (!mConfig.etcdNameSpace) {
-		// debug('watch() done. etcdNameSpace not defined');
-		return;
+	if (mConfig.etcdNameSpace) {
+		etcdHttp(true, function (err, data) {
+			if (!err && data) {
+				exports.load(null, function (err, vars) {
+					watchCallback(err, vars);
+				});
+			}
+		});
 	}
-	etcdHttp(true, function (err, data) {
-		if (!err && data) {
-			// debug('watch() triggered');
-			exports.load(null, function (err, vars) {
-				// debug('watch() back from load()');
-				watchCallback(err, vars);
-			});
-		}
-	});
 };
