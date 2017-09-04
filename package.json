@@ -1,0 +1,32 @@
+{
+  "name": "config-eec",
+  "version": "1.0.0",
+  "description": "A standardized way to get configuration into your script using Etcd, environment vars and command line arguments",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "./test/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Brayyy/Config-EEC-Node.js.git"
+  },
+  "keywords": [
+    "Config",
+    "etcd",
+    "environment",
+    "cli",
+    "arguments"
+  ],
+  "author": "Bray Almini <balmini@extremereach.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Brayyy/Config-EEC-Node.js/issues"
+  },
+  "homepage": "https://github.com/Brayyy/Config-EEC-Node.js#readme",
+  "dependencies": {
+    "run-series": "^1.1.4"
+  }
+}
