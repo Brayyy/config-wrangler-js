@@ -1,6 +1,9 @@
-var configEEC = require('../index.js');
+var configEec = require('../index.js');
 
-var configEECSetup = {
+var configEecSetup = {
+	requiredKeys: [
+		'logPath'
+	],
 	etcdNameSpace: 'cfg/flash-service/',
 	envNameSpace: 'FLASH'
 };
@@ -8,7 +11,7 @@ var configEECSetup = {
 
 function loadConfig () {
 	var start = Date.now();
-	configEEC.load(configEECSetup, function (err, config) {
+	configEec.load(configEecSetup, function (err, config) {
 		var bench = 'Took ' + (Date.now() - start) + 'ms';
 		if (err) {
 			console.log('LOAD ERROR.' + bench, err);
@@ -21,7 +24,7 @@ function loadConfig () {
 
 function reloadConfig () {
 	var start = Date.now();
-	configEEC.load(null, function (err, config) {
+	configEec.load(null, function (err, config) {
 		var bench = 'Took ' + (Date.now() - start) + 'ms';
 		if (err) {
 			console.log('LOAD ERROR.' + bench, err);
@@ -37,7 +40,7 @@ function beginWatch () {
 	setTimeout(function () {
 		console.log('WATCH init');
 		var start = Date.now();
-		configEEC.watch(function (err, config) {
+		configEec.watch(function (err, config) {
 			var bench = 'Took ' + (Date.now() - start) + 'ms';
 			if (err) {
 				console.log('WATCH ERROR.' + bench, err);
