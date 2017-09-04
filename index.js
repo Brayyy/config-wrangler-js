@@ -1,6 +1,6 @@
 var http = require('http');
 var runSeries = require('run-series');
-// var debug = require('debug')('ConfigEEC');
+// var debug = require('debug')('config-wrangler');
 
 var etcRetryDelay = 3000;
 var mConfig = {};
@@ -184,17 +184,21 @@ function queryArgs (callback) {
 }
 
 /**
- * Load config from all sources and return composite object of keys/values
+ * Set configuration of module
  * @param {*} mConfigIn Config data object passed in
+ */
+exports.config = function (mConfigIn) {
+	// debug('options() setting config');
+	mConfig = mConfigIn;
+};
+
+/**
+ * Load config from all sources and return composite object of keys/values
  * @param {*} watchCallback Function to call after config is fetched from all sources
  */
-exports.load = function (mConfigIn, loadCallback) {
+exports.load = function (loadCallback) {
 	// debug('load()');
 	foundVars = {};
-	if (mConfigIn) {
-		// debug('load() setting config');
-		mConfig = mConfigIn;
-	}
 	runSeries([
 		queryEtcd,
 		queryEnv,
@@ -204,7 +208,7 @@ exports.load = function (mConfigIn, loadCallback) {
 		if (mConfig.requiredKeys) {
 			mConfig.requiredKeys.forEach(function (key) {
 				if (foundVars[key] === undefined) {
-					console.error('ConfigEEC: Missing required config key "' + key + '", exiting.');
+					console.error('config-wrangler: Missing required config key "' + key + '", exiting.');
 					process.exit();
 				}
 			}, this);
